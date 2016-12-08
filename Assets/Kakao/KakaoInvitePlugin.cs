@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System;
 using GetSocialSdk.Core;
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 public class KakaoInvitePlugin : IInvitePlugin
 {
@@ -27,9 +28,9 @@ public class KakaoInvitePlugin : IInvitePlugin
 #if UNITY_ANDROID
         return IsKakaoInstalledAndroid();
 #elif UNITY_IOS
-        return true;
+        return _isKakaoInstalled();
 #else
-        return true;
+        return false;
 #endif
     }
 
@@ -65,8 +66,9 @@ public class KakaoInvitePlugin : IInvitePlugin
         SendInviteAndroid(text, referralDataUrl, onSuccess, onFailure);
 #endif
         
-        #if UNITY_IOS
-        #endif
+#if UNITY_IOS
+        SendInviteIOS(text, referralDataUrl, onSuccess);
+#endif
     }
 
     #if UNITY_ANDROID
@@ -100,5 +102,19 @@ public class KakaoInvitePlugin : IInvitePlugin
             }
         }
     }
+    #endif
+
+    #if UNITY_IOS
+    void SendInviteIOS(string text, string referralDataUrl, Action<string, List<string>> onSuccess)
+    {
+        _sendKakaoInvite(text, referralDataUrl);
+        onSuccess(null, null);
+    }
+
+    [DllImport("__Internal")]
+    static extern bool _sendKakaoInvite(string text, string referralDataUrl);
+
+    [DllImport("__Internal")]
+    static extern bool _isKakaoInstalled();
     #endif
 }
