@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.iOS.Xcode;
 using System.IO;
 using System;
+using System.Linq;
 
 public static class GetSocialKakaoPostprocess
 {
@@ -29,9 +30,9 @@ public static class GetSocialKakaoPostprocess
 
     static void PostProcessIosProject()
     {
-
-
         ModifyPlist(AddKakaoTalkUrlScheme);
+        ModifyPlist(AddKakaoAppKey);
+        ModifyPlist(AddApplicationQuerySceheme);
 
         Debug.Log("KAKAO TALK setup for iOS project");
     }
@@ -54,6 +55,35 @@ public static class GetSocialKakaoPostprocess
         PlistElementDict getSocialSchemeElem = cFBundleURLTypesElem.AddDict();
         getSocialSchemeElem.values[CFBundleURLSchemes] = getSocialUrlSchemesArray;
     }
+
+    static void AddKakaoAppKey(PlistDocument plist)
+    {
+        plist.root.SetString("KAKAO_APP_KEY", KAKAO_APP_KEY);
+    }
+
+    static void AddApplicationQuerySceheme(PlistDocument plist)
+    {
+        const string LSApplicationQueriesSchemes = "LSApplicationQueriesSchemes";
+
+        string[] kakaoSchemes =
+            {
+                KAKAO_URL_SCHEME,
+                "kakaokompassauth",
+                "storykompassauth",
+                "kakaolink",
+                "kakaotalk-4.5.0",
+                "kakaostory-2.9.0",
+                "storylink"
+            };
+
+        PlistElementArray appsArray;
+        appsArray = plist.root.values.ContainsKey(LSApplicationQueriesSchemes) ? 
+                (PlistElementArray)plist.root.values[LSApplicationQueriesSchemes] : 
+                plist.root.CreateArray(LSApplicationQueriesSchemes);
+        kakaoSchemes.ToList().ForEach(appsArray.AddString);
+    }
+
+    #region helpers
 
     static void ModifyProject(Action<PBXProject> modifier)
     {
@@ -83,5 +113,7 @@ public static class GetSocialKakaoPostprocess
             Debug.LogException(e);
         }
     }
+
+    #endregion
 }
 #endif
