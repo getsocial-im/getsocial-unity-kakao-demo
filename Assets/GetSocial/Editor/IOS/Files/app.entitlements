@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:sm1.getsocial.im</string>
+		<string>applinks:sm-alt.getsocial.im</string>
 		<string>applinks:sm.getsocial.im</string>
 	</array>
 </dict>
